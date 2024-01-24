@@ -1,51 +1,44 @@
-variable "vpc_ruth" { 
-  description = "My first VPC" 
-} 
-variable "cidr_block" { 
-  description = "CIDR block for the VPC" 
-} 
+1 : Create a VPC
+resource "aws_vpc" "myvpc"{
+    cidr_block = "10.0.0.0/16"
+    tags = {
+        Name = "MyVPC"
+    }
+}
 
-resource "aws_vpc" "main" { 
-  cidr_block = var.cidr_block 
-  enable_dns_support = true 
-  enable_dns_hostnames = true 
-  tags = { 
-    Name = var.vpc_name 
-  } 
-} 
+ 2: Create a public subnet
+resource "aws_subnet" "PublicSubnet"{
+    vpc_id = aws_vpc.myvpc.id
+    availability_zone = "us-east-1a"
+    cidr_block = "10.0.1.0/24"
+}
 
-resource "aws_internet_gateway" "main" { 
-  vpc_id = aws_vpc.main.id 
-  tags = { 
-    Name = "${var.vpc_ruth}-igw" 
-  } 
-} 
+ 3 : create a private subnet
+resource "aws_subnet" "PrivSubnet"{
+    vpc_id = aws_vpc.myvpc.id
+    cidr_block = "10.0.2.0/24"
+    map_public_ip_on_launch = true
 
-resource "aws_subnet" "main" { 
-  count = 2 
-  cidr_block = 
-  cidrsubnet(aws_vpc.main.cidr_block, 8, count.index) 
-    vpc_id = aws_vpc.main.id 
-    availability_zone = "us-east-1a" # Change as needed 
-    map_public_ip_on_launch = true 
+}
 
-    tags = { 
-      Name = "${var.vpc_name}-subnet-${count.index + 1}" 
-    } 
-} 
 
-resource "aws_route_table" "main" { 
-  vpc_id = aws_vpc.main.id 
+ 4 : create IGW
+resource "aws_internet_gateway" "myIgw"{
+    vpc_id = aws_vpc.myvpc.id
+}
 
-  route { 
-    cidr_block = "0.0.0.0/0" 
-    gateway_id = aws_internet_gateway.main.id 
-  } 
-} 
-
-resource "aws_route_table_association" "main" { 
-  count = 2 
-  subnet_id = aws_subnet.main[count.index].id 
-  route_table_id = aws_route_table.main.id 
-} 
+ 5 : route Tables for public subnet
+resource "aws_route_table" "PublicRT"{
+    vpc_id = aws_vpc.myvpc.id
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.myIgw.id
+    }
+}
  
+
+ 7 : route table association public subnet 
+resource "aws_route_table_association" "PublicRTAssociation"{
+    subnet_id = aws_subnet.PublicSubnet.id
+    route_table_id = aws_route_table.PublicRT.id
+}
