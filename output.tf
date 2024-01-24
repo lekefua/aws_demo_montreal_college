@@ -1,7 +1,3 @@
-variable "vpc_name" {
-  description = "Name of the VPC"
-}
-
-variable "cidr_block" {
-  description = "CIDR block for the VPC"
+output "vpc_id" {
+  value = aws_vpc.my_vpc.id
 }
