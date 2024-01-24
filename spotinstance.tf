@@ -1,9 +1,14 @@
-resource "aws_spot_instance_request" "cheap_worker" {
-  ami           = "ami-1234"
-  spot_price    = "0.03"
-  instance_type = "c4.xlarge"
- 
+resource "aws_instance" "spot_instance" {
+  count = 2
+
+  ami           = "ami-xxxxxxxxxxxxxxxxx"  # Replace with your desired AMI ID
+  instance_type = "t2.micro"  # Replace with your desired instance type
+  key_name      = "your-key-pair-name"  # Replace with your key pair name
+
+  spot_price    = "0.03"  # Replace with your desired maximum bid price
+  lifecycle     = "spot"
+
   tags = {
-    Name = "CheapWorker"
+    Name = "SpotInstance-${count.index + 1}"
   }
 }
