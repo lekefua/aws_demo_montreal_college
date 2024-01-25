@@ -1,6 +1,4 @@
-provider "aws" { 
-  region = "us-east-1" 
-  } 
+resource "aws_vpc" "myvpc"{
   
   module "my_vpc" { 
     source = "terraform-aws-modules/vpc/aws" 
@@ -21,3 +19,4 @@ provider "aws" {
   output "vpc_id" { 
     value = module.my_vpc.vpc_id
   }
+}
