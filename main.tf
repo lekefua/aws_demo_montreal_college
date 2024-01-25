@@ -1,4 +1,4 @@
-resource "aws_vpc" "myvpc"{
+resource "aws_vpc" "ruthvpc"{
   
   module "my_vpc" { 
     source = "terraform-aws-modules/vpc/aws" 
